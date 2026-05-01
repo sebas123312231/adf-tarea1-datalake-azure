@@ -1,5 +1,5 @@
 {
-	"name": "Ventas_online",
+	"name": "Ventas_online_json",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorageArceMendoza",

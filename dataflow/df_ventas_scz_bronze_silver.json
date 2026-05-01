@@ -1,0 +1,47 @@
+{
+	"name": "df_ventas_scz_bronze_silver",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Ventas_scz_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id_venta as string,",
+				"          fecha as string,",
+				"          producto as string,",
+				"          cantidad as string,",
+				"          precio_unitario as string,",
+				"          sucursal as string,",
+				"          vendedor as string,",
+				"          cliente_nombre as string,",
+				"          cliente_email as string,",
+				"          metodo_pago as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 derive(vendedor = trim(vendedor),",
+				"          cliente_nombre = trim(cliente_nombre),",
+				"          producto = trim(producto)) ~> derivedColumn1",
+				"derivedColumn1 derive(producto = initCap(regexReplace(producto,'\\\\s',' '))) ~> derivedColumn2"
+			]
+		}
+	}
+}
