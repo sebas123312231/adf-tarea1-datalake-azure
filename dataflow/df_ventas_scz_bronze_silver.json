@@ -19,6 +19,24 @@
 				},
 				{
 					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "filter1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn6"
 				}
 			],
 			"scriptLines": [
@@ -40,7 +58,35 @@
 				"source1 derive(vendedor = trim(vendedor),",
 				"          cliente_nombre = trim(cliente_nombre),",
 				"          producto = trim(producto)) ~> derivedColumn1",
-				"derivedColumn1 derive(producto = initCap(regexReplace(producto,'\\\\s',' '))) ~> derivedColumn2"
+				"derivedColumn1 derive(producto = initCap(regexReplace(producto,'\\\\s',' '))) ~> derivedColumn2",
+				"derivedColumn2 derive(sucursal = iif(in(['SCZ','Santa Cruz','Sta Cruz','santa cruz','SANTA CRUZ','Sta. Cruz','SC'],sucursal), 'Santa Cruz', sucursal)) ~> derivedColumn3",
+				"derivedColumn3 derive(precio_unitario = toFloat(regexReplace(toString(precio_unitario),'[^0-9.]','')),",
+				"          cantidad = toInteger(cantidad)) ~> derivedColumn4",
+				"derivedColumn4 derive(fecha = coalesce(\r",
+				"    toDate(fecha,'yyyy-MM-dd'),\r",
+				"    toDate(fecha,'dd-MM-yyyy'),\r",
+				"    toDate(fecha,'MM-dd-yyyy'),\r",
+				"    toDate(fecha,'dd/MM/yyyy'),\r",
+				"    toDate(fecha,'yyyy/MM/dd'),\r",
+				"    toDate(fecha,'dd/MMM/yyyy'),\r",
+				"    toDate(fecha,'dd-MMM-yyyy')\r",
+				")) ~> derivedColumn5",
+				"derivedColumn5 filter(cantidad > 0 && !isNull(precio_unitario) && !isNull(fecha) ) ~> filter1",
+				"filter1 select(mapColumn(",
+				"          id_venta,",
+				"          fecha,",
+				"          producto,",
+				"          cantidad,",
+				"          precio_unitario,",
+				"          sucursal,",
+				"          vendedor,",
+				"          cliente_nombre,",
+				"          cliente_email,",
+				"          metodo_pago",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(canal = 'Sucursal') ~> derivedColumn6"
 			]
 		}
 	}
