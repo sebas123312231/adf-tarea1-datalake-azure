@@ -1,0 +1,26 @@
+{
+	"name": "Ventas_sc_limpia_csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorageArceMendoza",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "silver"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "silver",
+				"fileSystem": "datalake-ventas"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
