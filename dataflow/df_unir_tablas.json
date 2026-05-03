@@ -1,0 +1,108 @@
+{
+	"name": "df_unir_tablas",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "limpio_scz",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "limpio_lpz",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				},
+				{
+					"dataset": {
+						"referenceName": "limpio_online",
+						"type": "DatasetReference"
+					},
+					"name": "source3"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Ventas_sc_limpia_csv",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "union1"
+				},
+				{
+					"name": "union2"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          id_venta as string,",
+				"          fecha as string,",
+				"          producto as string,",
+				"          cantidad as string,",
+				"          precio_unitario as string,",
+				"          sucursal as string,",
+				"          vendedor as string,",
+				"          cliente_nombre as string,",
+				"          cliente_email as string,",
+				"          metodo_pago as string,",
+				"          canal as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source(output(",
+				"          id_venta as string,",
+				"          fecha as string,",
+				"          producto as string,",
+				"          cantidad as string,",
+				"          precio_unitario as string,",
+				"          sucursal as string,",
+				"          vendedor as string,",
+				"          cliente_nombre as string,",
+				"          cliente_email as string,",
+				"          metodo_pago as string,",
+				"          canal as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source2",
+				"source(output(",
+				"          id_venta as string,",
+				"          fecha as string,",
+				"          producto as string,",
+				"          cantidad as string,",
+				"          precio_unitario as string,",
+				"          cliente_nombre as string,",
+				"          cliente_email as string,",
+				"          sucursal as string,",
+				"          metodo_pago as string,",
+				"          canal as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source3",
+				"source1, source2 union(byName: true)~> union1",
+				"union1, source3 union(byName: true)~> union2",
+				"union2 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['ventas_limpias_union.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
+			]
+		}
+	}
+}
