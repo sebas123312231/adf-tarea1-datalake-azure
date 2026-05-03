@@ -12,7 +12,15 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Ventas_sc_limpia_csv",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "select1"
@@ -25,6 +33,15 @@
 				},
 				{
 					"name": "derivedColumn3"
+				},
+				{
+					"name": "derivedColumn4"
+				},
+				{
+					"name": "derivedColumn5"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -69,16 +86,29 @@
 				"          metodo_pago = trim(metodo_pago)) ~> derivedColumn1",
 				"derivedColumn1 derive(sucursal = iif( in(['LPZ','La Paz','LP','la paz','LA PAZ','Lapaz','L.P.','LAPAZ'],sucursal),'La Paz',sucursal),",
 				"          canal = 'Sucursal') ~> derivedColumn2",
-				"derivedColumn2 derive(fecha = coalesce(     \r",
-				"    toDate(fecha,'yyyy-MM-dd'),     \r",
-				"    toDate(fecha,'dd-MM-yyyy'),     \r",
-				"    toDate(fecha,'MM-dd-yyyy'),     \r",
-				"    toDate(fecha,'dd/MM/yyyy'),     \r",
-				"    toDate(fecha,'yyyy/MM/dd'),     \r",
-				"    toDate(fecha,'dd/MMM/yyyy'),     \r",
+				"derivedColumn2 derive(fecha = coalesce(\r",
+				"    toDate(fecha,'yyyy-MM-dd'),\r",
+				"    toDate(fecha,'dd-MM-yyyy'),\r",
+				"    toDate(fecha,'MM-dd-yyyy'),\r",
+				"    toDate(fecha,'dd/MM/yyyy'),\r",
+				"    toDate(fecha,'yyyy/MM/dd'),\r",
+				"    toDate(fecha,'dd/MMM/yyyy'),\r",
 				"    toDate(fecha,'dd-MMM-yyyy'),\r",
 				"    toDate(fecha,'MMMM dd, yyyy')\r",
-				"    )) ~> derivedColumn3"
+				")) ~> derivedColumn3",
+				"derivedColumn3 derive(cantidad = toInteger(cantidad),",
+				"          precio_unitario = toFloat(regexReplace(toString(precio_unitario), '[^0-9.]', ''))) ~> derivedColumn4",
+				"derivedColumn4 derive(producto = initCap(trim(regexReplace(producto,'\\\\s+', \" \")))) ~> derivedColumn5",
+				"derivedColumn5 filter(cantidad > 0 && !isNull(precio_unitario) && !isNull(fecha)) ~> filter1",
+				"filter1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     partitionFileNames:['Ventas_lpz_limpia.csv'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
