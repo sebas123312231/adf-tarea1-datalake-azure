@@ -1,0 +1,67 @@
+{
+	"name": "df_venta_lpz_bronze_silver",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Ventas_lpz_csv",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "select1"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          ID_Venta as string,",
+				"          Fecha_Venta as string,",
+				"          Producto as string,",
+				"          Cant as string,",
+				"          PrecioUnit as string,",
+				"          Sucursal as string,",
+				"          Vendedor as string,",
+				"          NombreCliente as string,",
+				"          EmailCliente as string,",
+				"          MetodoPago as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 select(mapColumn(",
+				"          id_venta = ID_Venta,",
+				"          fecha = Fecha_Venta,",
+				"          producto = Producto,",
+				"          cantidad = Cant,",
+				"          precio_unitario = PrecioUnit,",
+				"          sucursal = Sucursal,",
+				"          vendedor = Vendedor,",
+				"          cliente_nombre = NombreCliente,",
+				"          cliente_email = EmailCliente,",
+				"          metodo_pago = MetodoPago",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 derive(id_venta = trim(id_venta),",
+				"          fecha = trim(fecha),",
+				"          producto = trim(producto),",
+				"          cantidad = trim(cantidad),",
+				"          precio_unitario = trim(precio_unitario),",
+				"          sucursal = trim(sucursal),",
+				"          vendedor = trim(vendedor),",
+				"          cliente_nombre = trim(cliente_nombre),",
+				"          cliente_email = trim(cliente_email),",
+				"          metodo_pago = trim(metodo_pago)) ~> derivedColumn1"
+			]
+		}
+	}
+}
