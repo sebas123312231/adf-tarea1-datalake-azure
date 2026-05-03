@@ -19,6 +19,12 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -60,7 +66,19 @@
 				"          vendedor = trim(vendedor),",
 				"          cliente_nombre = trim(cliente_nombre),",
 				"          cliente_email = trim(cliente_email),",
-				"          metodo_pago = trim(metodo_pago)) ~> derivedColumn1"
+				"          metodo_pago = trim(metodo_pago)) ~> derivedColumn1",
+				"derivedColumn1 derive(sucursal = iif( in(['LPZ','La Paz','LP','la paz','LA PAZ','Lapaz','L.P.','LAPAZ'],sucursal),'La Paz',sucursal),",
+				"          canal = 'Sucursal') ~> derivedColumn2",
+				"derivedColumn2 derive(fecha = coalesce(     \r",
+				"    toDate(fecha,'yyyy-MM-dd'),     \r",
+				"    toDate(fecha,'dd-MM-yyyy'),     \r",
+				"    toDate(fecha,'MM-dd-yyyy'),     \r",
+				"    toDate(fecha,'dd/MM/yyyy'),     \r",
+				"    toDate(fecha,'yyyy/MM/dd'),     \r",
+				"    toDate(fecha,'dd/MMM/yyyy'),     \r",
+				"    toDate(fecha,'dd-MMM-yyyy'),\r",
+				"    toDate(fecha,'MMMM dd, yyyy')\r",
+				"    )) ~> derivedColumn3"
 			]
 		}
 	}
